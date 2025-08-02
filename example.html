@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Example Test Page</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f6f8;
+    color: #333;
+    margin: 20px;
+    transition: background-color 0.3s, color 0.3s;
+  }
+
+  .dark-theme {
+    background-color: #222;
+    color: #eee;
+  }
+
+  h1 {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    cursor: pointer;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: background-color 0.3s;
+  }
+
+  button:hover {
+    background-color: #45a049;
+  }
+
+  form {
+    max-width: 400px;
+    margin: 0 auto 40px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.1);
+  }
+
+  input[type="text"], input[type="email"] {
+    width: 100%;
+    padding: 10px 12px;
+    margin: 8px 0 16px 0;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  /* Tooltip container */
+  .tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: help;
+  }
+
+  /* Tooltip text */
+  .tooltip .tooltiptext {
+    visibility: hidden;
+    width: 140px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 6px 8px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%; /* Above */
+    left: 50%;
+    margin-left: -70px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 14px;
+  }
+
+  /* Show tooltip text on hover */
+  .tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  /* Simple animation */
+  .box {
+    width: 100px;
+    height: 100px;
+    background-color: #2196F3;
+    margin: 0 auto 40px auto;
+    border-radius: 12px;
+    animation: bounce 2s infinite;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0);}
+    50% { transform: translateY(-30px);}
+  }
+
+  /* Message area */
+  #message {
+    text-align: center;
+    font-weight: bold;
+    margin-top: 20px;
+  }
+
+  /* Theme toggle */
+  #themeToggle {
+    display: block;
+    margin: 0 auto 40px auto;
+    background-color: #ff4081;
+  }
+</style>
+</head>
+<body>
+
+<h1>Пример тестовой страницы с плюшками</h1>
+
+<button id="themeToggle" title="Переключить светлую/тёмную тему">Переключить тему</button>
+
+<div class="box" title="Анимация bounce"></div>
+
+<form id="testForm">
+  <label for="name">Имя:</label>
+  <input type="text" id="name" name="name" placeholder="Введите ваше имя" required />
+
+  <label for="email">Email:</label>
+  <input type="email" id="email" name="email" placeholder="example@mail.com" required />
+
+  <div class="tooltip">?
+    <span class="tooltiptext">Введите корректный email для обратной связи.</span>
+  </div>
+
+  <button type="submit">Отправить</button>
+</form>
+
+<div id="message"></div>
+
+<script>
+  // Тема переключение
+  const themeToggleBtn = document.getElementById('themeToggle');
+  themeToggleBtn.addEventListener('click', () => {
+    document.body.classList.toggle('dark-theme');
+  });
+
+  // Обработка формы
+  const form = document.getElementById('testForm');
+  const messageDiv = document.getElementById('message');
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = form.name.value.trim();
+    const email = form.email.value.trim();
+
+    if (name === '' || email === '') {
+      messageDiv.textContent = 'Пожалуйста, заполните все поля.';
+      messageDiv.style.color = 'red';
+      return;
+    }
+
+    messageDiv.style.color = 'green';
+    messageDiv.textContent = `Спасибо, ${name}! Мы получили ваш email: ${email}`;
+    form.reset();
+  });
+</script>
+
+</body>
+</html>
