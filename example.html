@@ -170,5 +170,231 @@
   });
 </script>
 
+<!-- ▼ Fenst4r Cat Tapper v9 с HTML-подсказкой ─────────────────────────── -->
+<style>
+  #fenst4r-cat-box {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 150px;
+    height: 150px;
+    pointer-events: none;
+    z-index: 99999;
+  }
+  #fenst4r-cat {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    pointer-events: auto;
+    background-image: url('https://fenst4r.life/cat1.gif');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+  #fenst4r-tooltip {
+    position: absolute;
+    bottom: 100%;
+    right: 0;
+    background: rgba(0, 0, 0, 0.75);
+    color: white;
+    font-size: 14px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    max-width: 280px;
+    text-align: right;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(5px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    white-space: normal;
+    line-height: 1.3;
+    user-select: none;
+    z-index: 10;
+  }
+  #fenst4r-cat:hover #fenst4r-tooltip {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  #fenst4r-gear {
+    position: fixed;
+    bottom: 20px;
+    right: 180px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #7f4affaa;
+    color: #fff;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 100000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+  #fenst4r-gear.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  #fenst4r-gear:hover {
+    background: #6939d5;
+  }
+  #fenst4r-panel {
+    position: fixed;
+    bottom: 60px;
+    right: 180px;
+    width: 220px;
+    background: #2d1b46;
+    color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px #0007;
+    font-family: system-ui, sans-serif;
+    font-size: 14px;
+    padding: 12px 14px;
+    z-index: 100000;
+    display: none;
+  }
+  #fenst4r-panel label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 6px 0;
+  }
+  #fenst4r-panel input[type=range] {
+    width: 100%;
+  }
+  #fenst4r-panel .close {
+    text-align: right;
+    margin: -4px -2px 4px 0;
+    cursor: pointer;
+  }
+</style>
+
+<div id="fenst4r-cat-box">
+  <div id="fenst4r-cat">
+    <div id="fenst4r-tooltip">
+      Нажми на сайт — котик тапнет тоже<br>
+      Идея: @Seretere0566
+    </div>
+  </div>
+</div>
+
+<div id="fenst4r-gear" title="Котик-настройки">⚙️</div>
+<div id="fenst4r-panel">
+  <div class="close">✖</div>
+  <label><input type="checkbox" id="fenst4r-enabled"> Показать котика</label>
+  <label><input type="checkbox" id="fenst4r-sound"> Звук «тап»</label>
+  <label>Размер <span id="fenst4r-size-val"></span>
+    <input type="range" id="fenst4r-size" min="0.1" max="1" step="0.05">
+  </label>
+  <label>Громкость <span id="fenst4r-vol-val"></span>
+    <input type="range" id="fenst4r-volume" min="0" max="1" step="0.01">
+  </label>
+</div>
+
+<audio id="fenst4r-audio" src="https://fenst4r.life/tap.mp3" preload="auto"></audio>
+
+<script>
+  const COOKIE = 'fenst4rCatSettings';
+  const YEAR = 60 * 60 * 24 * 365;
+
+  function saveSettings(obj) {
+    document.cookie = COOKIE + '=' + encodeURIComponent(JSON.stringify(obj)) + ';max-age=' + YEAR + ';path=/';
+  }
+
+  function loadSettings(defaults) {
+    const m = document.cookie.match(RegExp('(?:^|;\\s*)' + COOKIE + '=([^;]*)'));
+    if (!m) return defaults;
+    try { return { ...defaults, ...JSON.parse(decodeURIComponent(m[1])) }; }
+    catch (e) { return defaults; }
+  }
+
+  const box   = document.getElementById('fenst4r-cat-box');
+  const cat   = document.getElementById('fenst4r-cat');
+  const gear  = document.getElementById('fenst4r-gear');
+  const panel = document.getElementById('fenst4r-panel');
+  const audio = document.getElementById('fenst4r-audio');
+
+  const cbEnabled = document.getElementById('fenst4r-enabled');
+  const cbSound   = document.getElementById('fenst4r-sound');
+  const rngSize   = document.getElementById('fenst4r-size');
+  const lblSize   = document.getElementById('fenst4r-size-val');
+  const rngVol    = document.getElementById('fenst4r-volume');
+  const lblVol    = document.getElementById('fenst4r-vol-val');
+
+  const DEF = { enabled: true, sound: true, size: 0.35, volume: 0.5 };
+  let S = loadSettings(DEF);
+
+  applySettings();
+
+  function tapCat() {
+    if (!S.enabled || cat.dataset.busy === '1') return;
+    cat.dataset.busy = '1';
+    cat.style.backgroundImage = "url('https://fenst4r.life/cat2.gif')";
+    if (S.sound) {
+      audio.volume = S.volume;
+      audio.currentTime = 0;
+      audio.play().catch(() => {});
+    }
+    setTimeout(() => {
+      cat.style.backgroundImage = "url('https://fenst4r.life/cat1.gif')";
+      cat.dataset.busy = '0';
+    }, 150);
+  }
+
+  function applySettings() {
+    box.style.display = S.enabled ? 'block' : 'none';
+    const base = 150;
+    box.style.width = (base * S.size) + 'px';
+    box.style.height = (base * S.size) + 'px';
+
+    cbEnabled.checked = S.enabled;
+    cbSound.checked = S.sound;
+    rngSize.value = S.size;
+    rngVol.value = S.volume;
+
+    lblSize.textContent = Math.round(S.size * 100) + '%';
+    lblVol.textContent = Math.round(S.volume * 100) + '%';
+
+    saveSettings(S);
+  }
+
+  window.addEventListener('click', tapCat);
+  window.addEventListener('keydown', tapCat);
+  window.addEventListener('touchstart', tapCat);
+  window.addEventListener('touchend', tapCat);
+
+  document.addEventListener('mousemove', (e) => {
+    const r = gear.getBoundingClientRect();
+    const near = e.clientX > r.left - 100 && e.clientX < r.right + 100 &&
+                 e.clientY > r.top - 100 && e.clientY < r.bottom + 100;
+    gear.classList.toggle('visible', near);
+  });
+
+  gear.onclick = () => {
+    panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+  };
+
+  panel.querySelector('.close').onclick = () => {
+    panel.style.display = 'none';
+  };
+
+  cbEnabled.onchange = () => { S.enabled = cbEnabled.checked; applySettings(); };
+  cbSound.onchange   = () => { S.sound   = cbSound.checked;  applySettings(); };
+  rngSize.oninput    = () => {
+    S.size = parseFloat(rngSize.value);
+    lblSize.textContent = Math.round(S.size * 100) + '%';
+    applySettings();
+  };
+  rngVol.oninput = () => {
+    S.volume = parseFloat(rngVol.value);
+    lblVol.textContent = Math.round(S.volume * 100) + '%';
+    applySettings();
+  };
+</script>
+<!-- ▲ Fenst4r Cat Tapper v9 ───────────────────────────────────────────── -->
+  
 </body>
 </html>
